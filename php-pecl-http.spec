@@ -1,3 +1,5 @@
+# centos/sclo spec file for php-pecl-raphf, from:
+#
 # remirepo spec file for php-pecl-http
 # with SCL compatibility, from:
 #
@@ -11,9 +13,9 @@
 #
 %if 0%{?scl:1}
 %if "%{scl}" == "rh-php56"
-%global sub_prefix more-php56-
+%global sub_prefix sclo-php56-
 %else
-%global sub_prefix %{scl_prefix}
+%global sub_prefix sclo-%{scl_prefix}
 %endif
 %endif
 
@@ -27,7 +29,6 @@
 # The project is pecl_http but the extension is only http
 %global proj_name pecl_http
 %global pecl_name http
-%global with_zts  0%{?__ztsphp:1}
 %if "%{php_version}" < "5.6"
 # after hash iconv propro raphf
 %global ini_name  z-%{pecl_name}.ini
@@ -45,7 +46,7 @@
 #global prever RC1
 Name:           %{?sub_prefix}php-pecl-http
 Version:        2.5.5
-Release:        1%{?dist}%{!?scl:%{!?nophptag:%(%{__php} -r 'echo ".".PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')}}
+Release:        1%{?dist}
 Summary:        Extended HTTP support
 
 License:        BSD
@@ -66,60 +67,22 @@ BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel >= 1.2.0.4
 BuildRequires:  curl-devel >= 7.18.2
 BuildRequires:  libidn-devel
-BuildRequires:  %{?sub_prefix}php-pecl-propro-devel >= 1.0.0
-BuildRequires:  %{?sub_prefix}php-pecl-raphf-devel  >= 1.1.0
-
-%if 0%{?scl:1} && 0%{?fedora} < 15 && 0%{?rhel} < 7 && "%{?scl_vendor}" != "remi"
-# Filter in the SCL collection
-%{?filter_requires_in: %filter_requires_in %{_libdir}/.*\.so}
-# libvent from SCL as not available in system
-BuildRequires: %{sub_prefix}libevent-devel  > 2
-Requires:      %{sub_prefix}libevent%{_isa} > 2
-Requires:      libcurl%{_isa}
-Requires:      zlib%{_isa}
-%global        _event_prefix %{_prefix}
-
-%else
-%global        _event_prefix %{_root_prefix}
-%if "%{?vendor}" == "Remi Collet"
-BuildRequires: libevent-devel > 2
-%else
-# Copr build
-BuildRequires: libevent-devel > 1.4
-%endif
-%endif
+BuildRequires:  libevent-devel > 1.4
+BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 1.0.0
+BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 1.1.0
 
 Requires:       %{?scl_prefix}php(zend-abi) = %{php_zend_api}
 Requires:       %{?scl_prefix}php(api) = %{php_core_api}
-%if "%{php_version}" < "5.4"
-# php 5.3.3 in EL-6 don't use arched virtual provides
-# so only requires real packages instead
-Requires:       %{?scl_prefix}php-common%{?_isa}
-%else
 Requires:       %{?scl_prefix}php-hash%{?_isa}
 Requires:       %{?scl_prefix}php-iconv%{?_isa}
 Requires:       %{?scl_prefix}php-spl%{?_isa}
-%endif
 Requires:       %{?scl_prefix}php-pecl(propro)%{?_isa} >= 1.0.0
 Requires:       %{?scl_prefix}php-pecl(raphf)%{?_isa}  >= 1.1.0
-%if "%{php_version}" > "5.6"
-# V1 don't support PHP 5.6 https://bugs.php.net/66879
-Obsoletes:      %{?scl_prefix}php-pecl-http1 < 2
-%else
-# Can't install both versions of the same extension
-Conflicts:      %{?scl_prefix}php-pecl-http1
-%endif
-%if 0%{?fedora} < 22
-# new extensions split off this one.
-Requires:       %{?scl_prefix}php-pecl(json_post)%{?_isa}
-Requires:       %{?scl_prefix}php-pecl(apfd)%{?_isa}
-%endif
-%{?_sclreq:Requires: %{?scl_prefix}runtime%{?_sclreq}%{?_isa}}
 
 Provides:       %{?scl_prefix}php-pecl(%{proj_name})         = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-pecl(%{proj_name})%{?_isa} = %{version}%{?prever}
-Provides:       %{?scl_prefix}php-pecl-%{pecl_name}          = %{version}%{?prever}
-Provides:       %{?scl_prefix}php-pecl-%{pecl_name}%{?_isa}  = %{version}%{?prever}
+Provides:       %{?scl_prefix}php-pecl-%{pecl_name}          = %{version}-%{release}
+Provides:       %{?scl_prefix}php-pecl-%{pecl_name}%{?_isa}  = %{version}-%{release}
 Provides:       %{?scl_prefix}php-pecl(%{pecl_name})         = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-pecl(%{pecl_name})%{?_isa} = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-%{pecl_name}               = %{version}%{?prever}
@@ -180,15 +143,8 @@ Summary:       Extended HTTP support developer files (header)
 Group:         Development/Libraries
 Requires:      %{name}%{?_isa} = %{version}-%{release}
 Requires:      %{?scl_prefix}php-devel%{?_isa} >= 5.3.0
-%if "%{php_version}" > "5.6"
-# V1 don't support PHP 5.6 https://bugs.php.net/66879
-Obsoletes:     %{?scl_prefix}php-pecl-http1-devel < 2
-%else
-# Can't install both versions of the same extension
-Conflicts:     %{?scl_prefix}php-pecl-http1-devel
-%endif
-Provides:      %{?scl_prefix}php-pecl-%{pecl_name}-devel          = %{version}%{?prever}
-Provides:      %{?scl_prefix}php-pecl-%{pecl_name}-devel%{?_isa}  = %{version}%{?prever}
+Provides:      %{?scl_prefix}php-pecl-%{pecl_name}-devel = %{version}-%{release}
+Provides:      %{?scl_prefix}php-pecl-%{pecl_name}-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 These are the files needed to compile programs using HTTP extension.
@@ -210,11 +166,6 @@ cd ..
 
 cp %{SOURCE1} %{ini_name}
 
-%if %{with_zts}
-# Duplicate source tree for NTS / ZTS build
-cp -pr NTS ZTS
-%endif
-
 
 %build
 peclconf() {
@@ -232,13 +183,6 @@ cd NTS
 peclconf %{_bindir}/php-config
 make %{?_smp_mflags}
 
-%if %{with_zts}
-cd ../ZTS
-%{_bindir}/zts-phpize
-peclconf %{_bindir}/zts-php-config
-make %{?_smp_mflags}
-%endif
-
 
 %install
 rm -rf %{buildroot}
@@ -250,11 +194,6 @@ install -Dpm 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
 
 # install config file
 install -Dpm644 %{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
-
-%if %{with_zts}
-make -C ZTS install INSTALL_ROOT=%{buildroot}
-install -Dpm644 %{ini_name} %{buildroot}%{php_ztsinidir}/%{ini_name}
-%endif
 
 # Test & Documentation
 cd NTS
@@ -305,23 +244,6 @@ NO_INTERACTION=1 \
 %{__php} -n run-tests.php --show-diff
 %endif
 
-%if %{with_zts}
-: Minimal load test for ZTS extension
-%{__ztsphp} --no-php-ini \
-    $modules \
-    --define extension=%{buildroot}%{php_ztsextdir}/%{pecl_name}.so \
-    --modules | grep %{pecl_name}
-
-%if %{with_tests}
-: Upstream test suite ZTS extension
-cd ../ZTS
-TEST_PHP_EXECUTABLE=%{__ztsphp} \
-TEST_PHP_ARGS="-n $modules -d extension=$PWD/modules/%{pecl_name}.so" \
-NO_INTERACTION=1 \
-%{__ztsphp} -n run-tests.php --show-diff
-%endif
-%endif
-
 
 # when pear installed alone, after us
 %triggerin -- %{?scl_prefix}php-pear
@@ -347,28 +269,22 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%{?_licensedir:%license NTS/LICENSE}
 %doc %{pecl_docdir}/%{proj_name}
 %config(noreplace) %{php_inidir}/%{ini_name}
 %{php_extdir}/%{pecl_name}.so
 %{pecl_xmldir}/%{name}.xml
 
-%if %{with_zts}
-%config(noreplace) %{php_ztsinidir}/%{ini_name}
-%{php_ztsextdir}/%{pecl_name}.so
-%endif
 
 %files devel
 %defattr(-,root,root,-)
 %doc %{pecl_testdir}/%{proj_name}
 %{php_incldir}/ext/%{pecl_name}
 
-%if %{with_zts}
-%{php_ztsincldir}/ext/%{pecl_name}
-%endif
-
 
 %changelog
+* Tue Jan 19 2016 Remi Collet <remi@fedoraproject.org> - 2.5.5-1
+- cleanup for SCLo build
+
 * Mon Dec  7 2015 Remi Collet <remi@fedoraproject.org> - 2.5.5-1
 - Update to 2.5.5 (stable)
 
