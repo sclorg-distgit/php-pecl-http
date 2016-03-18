@@ -45,7 +45,7 @@
 
 #global prever RC1
 Name:           %{?sub_prefix}php-pecl-http
-Version:        2.5.5
+Version:        2.5.6
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -282,6 +282,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Mar 18 2016 Remi Collet <remi@fedoraproject.org> - 2.5.6-1
+- Update to 2.5.6 (stable, security)
+
 * Tue Jan 19 2016 Remi Collet <remi@fedoraproject.org> - 2.5.5-1
 - cleanup for SCLo build
 
