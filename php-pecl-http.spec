@@ -1,4 +1,4 @@
-# centos/sclo spec file for php-pecl-raphf, from:
+# centos/sclo spec file for php-pecl-http, from:
 #
 # remirepo spec file for php-pecl-http
 # with SCL compatibility, from:
@@ -12,30 +12,21 @@
 # Please, preserve the changelog entries
 #
 %if 0%{?scl:1}
-%if "%{scl}" == "rh-php56"
-%global sub_prefix sclo-php56-
+%if "%{scl}" == "rh-php70"
+%global sub_prefix sclo-php70-
 %else
 %global sub_prefix sclo-%{scl_prefix}
 %endif
+%scl_package         php-pecl-http
+%else
+%global _root_prefix %{_prefix}
 %endif
-
-%{?scl:          %scl_package         php-pecl-http}
-%{!?scl:         %global _root_prefix %{_prefix}}
-%{!?php_inidir:  %global php_inidir   %{_sysconfdir}/php.d}
-%{!?php_incldir: %global php_incldir  %{_includedir}/php}
-%{!?__pecl:      %global __pecl       %{_bindir}/pecl}
-%{!?__php:       %global __php        %{_bindir}/php}
 
 # The project is pecl_http but the extension is only http
 %global proj_name pecl_http
 %global pecl_name http
-%if "%{php_version}" < "5.6"
-# after hash iconv propro raphf
-%global ini_name  z-%{pecl_name}.ini
-%else
 # after 20-iconv 40-propro 40-raphf
 %global ini_name  50-%{pecl_name}.ini
-%endif
 %ifarch %{arm}
 # Test suite disabled because of erratic results on slow ARM (timeout)
 %global with_tests 0%{?_with_tests:1}
@@ -43,9 +34,8 @@
 %global with_tests 0%{!?_without_tests:1}
 %endif
 
-#global prever RC1
 Name:           %{?sub_prefix}php-pecl-http
-Version:        2.5.6
+Version:        3.0.1
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -57,8 +47,7 @@ Source0:        http://pecl.php.net/get/%{proj_name}-%{version}%{?prever}.tgz
 # From http://www.php.net/manual/en/http.configuration.php
 Source1:        %{proj_name}.ini
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  %{?scl_prefix}php-devel >= 5.3.0
+BuildRequires:  %{?scl_prefix}php-devel >= 7
 BuildRequires:  %{?scl_prefix}php-hash
 BuildRequires:  %{?scl_prefix}php-iconv
 BuildRequires:  %{?scl_prefix}php-spl
@@ -68,8 +57,8 @@ BuildRequires:  zlib-devel >= 1.2.0.4
 BuildRequires:  curl-devel >= 7.18.2
 BuildRequires:  libidn-devel
 BuildRequires:  libevent-devel > 1.4
-BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 1.0.0
-BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 1.1.0
+BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 2
+BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 2
 
 Requires:       %{?scl_prefix}php(zend-abi) = %{php_zend_api}
 Requires:       %{?scl_prefix}php(api) = %{php_core_api}
@@ -185,8 +174,6 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
-
 make -C NTS install INSTALL_ROOT=%{buildroot}
 
 # Install XML package description
@@ -263,12 +250,7 @@ if [ $1 -eq 0 -a -x %{__pecl} ] ; then
 fi
 
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
-%defattr(-,root,root,-)
 %doc %{pecl_docdir}/%{proj_name}
 %config(noreplace) %{php_inidir}/%{ini_name}
 %{php_extdir}/%{pecl_name}.so
@@ -276,12 +258,14 @@ rm -rf %{buildroot}
 
 
 %files devel
-%defattr(-,root,root,-)
 %doc %{pecl_testdir}/%{proj_name}
 %{php_incldir}/ext/%{pecl_name}
 
 
 %changelog
+* Thu Nov  3 2016 Remi Collet <remi@fedoraproject.org> - 3.0.1-1
+- update to 3.0.1 for PHP 7
+
 * Fri Mar 18 2016 Remi Collet <remi@fedoraproject.org> - 2.5.6-1
 - Update to 2.5.6 (stable, security)
 
