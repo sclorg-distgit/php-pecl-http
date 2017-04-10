@@ -5,7 +5,7 @@
 #
 # Fedora spec file for php-pecl-http
 #
-# Copyright (c) 2012-2016 Remi Collet
+# Copyright (c) 2012-2017 Remi Collet
 # License: CC-BY-SA
 # http://creativecommons.org/licenses/by-sa/4.0/
 #
@@ -35,7 +35,7 @@
 %endif
 
 Name:           %{?sub_prefix}php-pecl-http
-Version:        3.0.1
+Version:        3.1.0
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -56,9 +56,11 @@ BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel >= 1.2.0.4
 BuildRequires:  curl-devel >= 7.18.2
 BuildRequires:  libidn-devel
+BuildRequires:  libicu-devel
 BuildRequires:  libevent-devel > 1.4
 BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 2
 BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 2
+BuildRequires:  pkgconfig
 
 Requires:       %{?scl_prefix}php(zend-abi) = %{php_zend_api}
 Requires:       %{?scl_prefix}php(api) = %{php_core_api}
@@ -163,6 +165,7 @@ peclconf() {
   --with-http-zlib-dir=%{_root_prefix} \
   --with-http-libcurl-dir=%{_root_prefix} \
   --with-http-libidn-dir=%{_root_prefix} \
+  --with-http-libicu-dir=%{_root_prefix} \
   --with-http-libevent-dir=%{_event_prefix} \
   --with-libdir=%{_lib} \
   --with-php-config=$1
@@ -193,20 +196,8 @@ done
 
 
 %check
-%if "%{php_version}" < "5.4"
-# Known failed test with 5.3.3 (need investigations)
-export REPORT_EXIT_STATUS=0
-%else
 export REPORT_EXIT_STATUS=1
-%endif
-user=$(id -un)
-: all tests when rpmbuild is used
-if [ "$user" = "remi" ]; then
-export SKIP_ONLINE_TESTS=0
-else
-: only local tests when mock is used
 export SKIP_ONLINE_TESTS=1
-fi
 
 # Shared needed extensions
 modules=""
@@ -263,6 +254,9 @@ fi
 
 
 %changelog
+* Mon Apr 10 2017 Remi Collet <remi@fedoraproject.org> - 3.1.0-1
+- update to 3.1.0
+
 * Thu Nov  3 2016 Remi Collet <remi@fedoraproject.org> - 3.0.1-1
 - update to 3.0.1 for PHP 7
 
