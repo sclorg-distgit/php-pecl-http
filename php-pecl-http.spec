@@ -5,7 +5,7 @@
 #
 # Fedora spec file for php-pecl-http
 #
-# Copyright (c) 2012-2016 Remi Collet
+# Copyright (c) 2012-2017 Remi Collet
 # License: CC-BY-SA
 # http://creativecommons.org/licenses/by-sa/4.0/
 #
@@ -17,14 +17,10 @@
 %else
 %global sub_prefix sclo-%{scl_prefix}
 %endif
+%scl_package       php-pecl-http
+%else
+%global _root_prefix %{_prefix}
 %endif
-
-%{?scl:          %scl_package         php-pecl-http}
-%{!?scl:         %global _root_prefix %{_prefix}}
-%{!?php_inidir:  %global php_inidir   %{_sysconfdir}/php.d}
-%{!?php_incldir: %global php_incldir  %{_includedir}/php}
-%{!?__pecl:      %global __pecl       %{_bindir}/pecl}
-%{!?__php:       %global __php        %{_bindir}/php}
 
 # The project is pecl_http but the extension is only http
 %global proj_name pecl_http
@@ -45,7 +41,7 @@
 
 #global prever RC1
 Name:           %{?sub_prefix}php-pecl-http
-Version:        2.5.6
+Version:        2.6.0
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -57,7 +53,6 @@ Source0:        http://pecl.php.net/get/%{proj_name}-%{version}%{?prever}.tgz
 # From http://www.php.net/manual/en/http.configuration.php
 Source1:        %{proj_name}.ini
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  %{?scl_prefix}php-devel >= 5.3.0
 BuildRequires:  %{?scl_prefix}php-hash
 BuildRequires:  %{?scl_prefix}php-iconv
@@ -67,7 +62,7 @@ BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel >= 1.2.0.4
 BuildRequires:  curl-devel >= 7.18.2
 BuildRequires:  libidn-devel
-BuildRequires:  libevent-devel > 1.4
+BuildRequires:  pkgconfig(libevent) > 2
 BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 1.0.0
 BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 1.1.0
 
@@ -87,26 +82,6 @@ Provides:       %{?scl_prefix}php-pecl(%{pecl_name})         = %{version}%{?prev
 Provides:       %{?scl_prefix}php-pecl(%{pecl_name})%{?_isa} = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-%{pecl_name}               = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-%{pecl_name}%{?_isa}       = %{version}%{?prever}
-
-%if "%{?vendor}" == "Remi Collet" && 0%{!?scl:1}
-# Other third party repo stuff
-Obsoletes:     php53-pecl-http  <= %{version}
-Obsoletes:     php53u-pecl-http <= %{version}
-Obsoletes:     php54-pecl-http  <= %{version}
-Obsoletes:     php54w-pecl-http <= %{version}
-%if "%{php_version}" > "5.5"
-Obsoletes:     php55u-pecl-http <= %{version}
-Obsoletes:     php55w-pecl-http <= %{version}
-%endif
-%if "%{php_version}" > "5.6"
-Obsoletes:     php56u-pecl-http <= %{version}
-Obsoletes:     php56w-pecl-http <= %{version}
-%endif
-%if "%{php_version}" > "7.0"
-Obsoletes:     php70u-pecl-http <= %{version}
-Obsoletes:     php70w-pecl-http <= %{version}
-%endif
-%endif
 
 %if 0%{?fedora} < 20 && 0%{?rhel} < 7
 # Filter shared private
@@ -185,8 +160,6 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
-
 make -C NTS install INSTALL_ROOT=%{buildroot}
 
 # Install XML package description
@@ -206,20 +179,8 @@ done
 
 
 %check
-%if "%{php_version}" < "5.4"
-# Known failed test with 5.3.3 (need investigations)
-export REPORT_EXIT_STATUS=0
-%else
 export REPORT_EXIT_STATUS=1
-%endif
-user=$(id -un)
-: all tests when rpmbuild is used
-if [ "$user" = "remi" ]; then
-export SKIP_ONLINE_TESTS=0
-else
-: only local tests when mock is used
 export SKIP_ONLINE_TESTS=1
-fi
 
 # Shared needed extensions
 modules=""
@@ -263,12 +224,7 @@ if [ $1 -eq 0 -a -x %{__pecl} ] ; then
 fi
 
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
-%defattr(-,root,root,-)
 %doc %{pecl_docdir}/%{proj_name}
 %config(noreplace) %{php_inidir}/%{ini_name}
 %{php_extdir}/%{pecl_name}.so
@@ -276,12 +232,15 @@ rm -rf %{buildroot}
 
 
 %files devel
-%defattr(-,root,root,-)
 %doc %{pecl_testdir}/%{proj_name}
 %{php_incldir}/ext/%{pecl_name}
 
 
 %changelog
+* Mon Apr 10 2017 Remi Collet <remi@remirepo.net> - 2.6.0-1
+- Update to 2.6.0
+- always build against libevent v2
+
 * Fri Mar 18 2016 Remi Collet <remi@fedoraproject.org> - 2.5.6-1
 - Update to 2.5.6 (stable, security)
 
