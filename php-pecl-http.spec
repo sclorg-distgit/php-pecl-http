@@ -12,10 +12,12 @@
 # Please, preserve the changelog entries
 #
 %if 0%{?scl:1}
+%global sub_prefix %{scl_prefix}
 %if "%{scl}" == "rh-php70"
 %global sub_prefix sclo-php70-
-%else
-%global sub_prefix sclo-%{scl_prefix}
+%endif
+%if "%{scl}" == "rh-php71"
+%global sub_prefix sclo-php71-
 %endif
 %scl_package         php-pecl-http
 %else
@@ -36,7 +38,7 @@
 
 Name:           %{?sub_prefix}php-pecl-http
 Version:        3.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Extended HTTP support
 
 License:        BSD
@@ -254,6 +256,9 @@ fi
 
 
 %changelog
+* Wed Aug  9 2017 Remi Collet <remi@remirepo.net> - 3.1.0-2
+- minor change for sclo-php71
+
 * Mon Apr 10 2017 Remi Collet <remi@fedoraproject.org> - 3.1.0-1
 - update to 3.1.0
 
