@@ -5,7 +5,7 @@
 #
 # Fedora spec file for php-pecl-http
 #
-# Copyright (c) 2012-2018 Remi Collet
+# Copyright (c) 2012-2019 Remi Collet
 # License: CC-BY-SA
 # http://creativecommons.org/licenses/by-sa/4.0/
 #
@@ -40,18 +40,18 @@
 %endif
 
 Name:           %{?sub_prefix}php-pecl-http
-Version:        3.1.0
-Release:        3%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 Summary:        Extended HTTP support
 
 License:        BSD
-Group:          Development/Languages
 URL:            http://pecl.php.net/package/pecl_http
 Source0:        http://pecl.php.net/get/%{proj_name}-%{version}%{?prever}.tgz
 
 # From http://www.php.net/manual/en/http.configuration.php
 Source1:        %{proj_name}.ini
 
+BuildRequires:  gcc
 BuildRequires:  %{?scl_prefix}php-devel >= 7
 BuildRequires:  %{?scl_prefix}php-hash
 BuildRequires:  %{?scl_prefix}php-iconv
@@ -60,9 +60,9 @@ BuildRequires:  %{?scl_prefix}php-pear
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel >= 1.2.0.4
 BuildRequires:  curl-devel >= 7.18.2
-BuildRequires:  libidn-devel
 BuildRequires:  libicu-devel
 BuildRequires:  libevent-devel > 1.4
+BuildRequires:  openssl-devel
 BuildRequires:  %{?scl_prefix}php-pecl-propro-devel >= 2
 BuildRequires:  %{?scl_prefix}php-pecl-raphf-devel  >= 2
 BuildRequires:  pkgconfig
@@ -72,8 +72,8 @@ Requires:       %{?scl_prefix}php(api) = %{php_core_api}
 Requires:       %{?scl_prefix}php-hash%{?_isa}
 Requires:       %{?scl_prefix}php-iconv%{?_isa}
 Requires:       %{?scl_prefix}php-spl%{?_isa}
-Requires:       %{?scl_prefix}php-pecl(propro)%{?_isa} >= 1.0.0
-Requires:       %{?scl_prefix}php-pecl(raphf)%{?_isa}  >= 1.1.0
+Requires:       %{?scl_prefix}php-pecl(propro)%{?_isa}
+Requires:       %{?scl_prefix}php-pecl(raphf)%{?_isa}
 
 Provides:       %{?scl_prefix}php-pecl(%{proj_name})         = %{version}%{?prever}
 Provides:       %{?scl_prefix}php-pecl(%{proj_name})%{?_isa} = %{version}%{?prever}
@@ -169,9 +169,15 @@ peclconf() {
   --with-http \
   --with-http-zlib-dir=%{_root_prefix} \
   --with-http-libcurl-dir=%{_root_prefix} \
-  --with-http-libidn-dir=%{_root_prefix} \
+  --without-http-libidn-dir \
+  --without-http-libidn2-dir \
+  --without-http-libidnkit-dir \
+  --without-http-libidnkit2-dir \
+  --without-http-libidnkit-dir \
+  --without-http-libidnkit2-dir \
   --with-http-libicu-dir=%{_root_prefix} \
   --with-http-libevent-dir=%{_event_prefix} \
+  --without-http-libbrotli-dir \
   --with-libdir=%{_lib} \
   --with-php-config=$1
 }
@@ -204,6 +210,8 @@ done
 export REPORT_EXIT_STATUS=1
 export SKIP_ONLINE_TESTS=1
 rm ?TS/tests/querystring001.phpt
+rm ?TS/tests/client022.phpt
+rm ?TS/tests/client027.phpt
 
 # Shared needed extensions
 modules=""
@@ -260,6 +268,9 @@ fi
 
 
 %changelog
+* Tue Mar 12 2019 Remi Collet <remi@remirepo.net> - 3.2.0-1
+- update to 3.2.0
+
 * Thu Nov 15 2018 Remi Collet <remi@remirepo.net> - 3.1.0-3
 - build for sclo-php72
 
