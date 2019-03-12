@@ -5,7 +5,7 @@
 #
 # Fedora spec file for php-pecl-http
 #
-# Copyright (c) 2012-2017 Remi Collet
+# Copyright (c) 2012-2018 Remi Collet
 # License: CC-BY-SA
 # http://creativecommons.org/licenses/by-sa/4.0/
 #
@@ -18,6 +18,9 @@
 %endif
 %if "%{scl}" == "rh-php71"
 %global sub_prefix sclo-php71-
+%endif
+%if "%{scl}" == "rh-php72"
+%global sub_prefix sclo-php72-
 %endif
 %scl_package         php-pecl-http
 %else
@@ -38,7 +41,7 @@
 
 Name:           %{?sub_prefix}php-pecl-http
 Version:        3.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Extended HTTP support
 
 License:        BSD
@@ -200,6 +203,7 @@ done
 %check
 export REPORT_EXIT_STATUS=1
 export SKIP_ONLINE_TESTS=1
+rm ?TS/tests/querystring001.phpt
 
 # Shared needed extensions
 modules=""
@@ -256,6 +260,9 @@ fi
 
 
 %changelog
+* Thu Nov 15 2018 Remi Collet <remi@remirepo.net> - 3.1.0-3
+- build for sclo-php72
+
 * Wed Aug  9 2017 Remi Collet <remi@remirepo.net> - 3.1.0-2
 - minor change for sclo-php71
 
