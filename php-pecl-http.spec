@@ -22,6 +22,9 @@
 %if "%{scl}" == "rh-php72"
 %global sub_prefix sclo-php72-
 %endif
+%if "%{scl}" == "rh-php73"
+%global sub_prefix sclo-php73-
+%endif
 %scl_package         php-pecl-http
 %else
 %global _root_prefix %{_prefix}
@@ -40,7 +43,7 @@
 %endif
 
 Name:           %{?sub_prefix}php-pecl-http
-Version:        3.2.0
+Version:        3.2.1
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -210,8 +213,11 @@ done
 export REPORT_EXIT_STATUS=1
 export SKIP_ONLINE_TESTS=1
 rm ?TS/tests/querystring001.phpt
+rm ?TS/tests/client016.phpt
+rm ?TS/tests/client021.phpt
 rm ?TS/tests/client022.phpt
 rm ?TS/tests/client027.phpt
+rm ?TS/tests/client028.phpt
 
 # Shared needed extensions
 modules=""
@@ -268,6 +274,9 @@ fi
 
 
 %changelog
+* Tue Jun 11 2019 Remi Collet <remi@remirepo.net> - 3.2.1-1
+- update to 3.2.1
+
 * Tue Mar 12 2019 Remi Collet <remi@remirepo.net> - 3.2.0-1
 - update to 3.2.0
 
