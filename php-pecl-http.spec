@@ -43,7 +43,7 @@
 %endif
 
 Name:           %{?sub_prefix}php-pecl-http
-Version:        3.2.1
+Version:        3.2.2
 Release:        1%{?dist}
 Summary:        Extended HTTP support
 
@@ -274,6 +274,9 @@ fi
 
 
 %changelog
+* Thu Oct 24 2019 Remi Collet <remi@remirepo.net> - 3.2.2-1
+- update to 3.2.2
+
 * Tue Jun 11 2019 Remi Collet <remi@remirepo.net> - 3.2.1-1
 - update to 3.2.1
 
